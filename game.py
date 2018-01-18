@@ -8,6 +8,8 @@ class Game:
     def __init__(self):
         self.objs = {}
         self.camera = PerspectiveCamera()
+        self.clock = pg.time.Clock()
+        self.fps = 60
 
     def startup(self):
         pg.init()
@@ -18,10 +20,10 @@ class Game:
         pg.display.set_caption("Vegetables")
         glClearColor(0,0,0,0)
 
-        triangle = Triangle()
-        triangle.pos[2] = -2
+        self.objs["triangle"] = Triangle()
+        self.objs["triangle"].pos[2] = -3
 
-        self.objs["triangle"] = triangle
+        self.camera.setPosition([0, 0, 2])
 
     def draw(self):
         # Clear
@@ -31,11 +33,10 @@ class Game:
         # Swap Pygame display
         pg.display.flip()
 
-    def update(self):
-        self.camera.pos[2] += 0.01
-        self.camera.update()
+    def update(self, dt):
+        self.camera.moveRelative([0, 0, -dt])
 
-    def loop(self):    
+    def loop(self):
         # Game loop
         while True:
             # Handle events
@@ -43,7 +44,8 @@ class Game:
                     if event.type == pg.QUIT:
                         return
             self.draw()
-            self.update()
+            dt = self.clock.tick(self.fps) / 1000.0
+            self.update(dt)
 
         pg.quit()
 

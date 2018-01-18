@@ -18,3 +18,8 @@ def scaleMatrix(s):
         [0, 0, s[2], 0],
         [0, 0, 0, 1]
     ], dtype="float32")
+
+def normalize(v):
+    n = np.linalg.norm(v)
+    if n > 0: return v / n
+    else: return v

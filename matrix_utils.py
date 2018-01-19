@@ -8,9 +8,6 @@ def translationMatrix(p):
         [0, 0, 0, 1]
     ], dtype="float32")
 
-def rotationMatrix():
-    pass
-
 def scaleMatrix(s):
     return np.matrix([
         [s[0], 0, 0, 0],
@@ -20,6 +17,7 @@ def scaleMatrix(s):
     ], dtype="float32")
 
 def normalize(v):
+    v = np.array(v)
     n = np.linalg.norm(v)
     if n > 0: return v / n
     else: return v

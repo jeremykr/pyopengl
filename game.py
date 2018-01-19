@@ -34,7 +34,28 @@ class Game:
         pg.display.flip()
 
     def update(self, dt):
-        self.camera.moveRelative([0, 0, -dt])
+        keys = pg.key.get_pressed()
+
+        # Rotate camera
+        camRotSpeed = 50*dt
+        if keys[pg.K_LEFT]: self.camera.rotate(camRotSpeed, [0,1,0])
+        if keys[pg.K_RIGHT]: self.camera.rotate(-camRotSpeed, [0,1,0])
+        if keys[pg.K_UP]: self.camera.rotate(-camRotSpeed, [1,0,0])
+        if keys[pg.K_DOWN]: self.camera.rotate(camRotSpeed, [1,0,0])
+        if keys[pg.K_q]: self.camera.rotate(camRotSpeed, [0,0,1])
+        if keys[pg.K_e]: self.camera.rotate(-camRotSpeed, [0,0,1])
+
+        # Move camera
+        moveDirection = [0, 0, 0]
+        camMoveSpeed = 3 * dt
+        if keys[pg.K_w]: moveDirection[2] += -1
+        if keys[pg.K_s]: moveDirection[2] += 1
+        if keys[pg.K_a]: moveDirection[0] += -1
+        if keys[pg.K_d]: moveDirection[0] += 1
+        if keys[pg.K_f]: moveDirection[1] += -1
+        if keys[pg.K_r]: moveDirection[1] += 1
+        moveDirection = normalize(moveDirection)
+        self.camera.move(moveDirection * camMoveSpeed)
 
     def loop(self):
         # Game loop

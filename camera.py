@@ -1,5 +1,7 @@
 import numpy as np
 from matrix_utils import *
+from numpy.linalg import inv
+from pyquaternion import *
 
 class PerspectiveCamera:
     def __init__(self):
@@ -9,9 +11,10 @@ class PerspectiveCamera:
         self.near_plane = 0.01
         self.fov = 60
         self.aspect_ratio = self.view_width / self.view_height
-        
+
+        self.pos = np.zeros(3, dtype="float32")
+        self.quat = Quaternion()
         self.viewMatrix = np.identity(4, dtype="float32")
-        self.rotMatrix = np.identity(4, dtype="float32")
 
         n = self.near_plane
         f = self.far_plane
@@ -25,19 +28,22 @@ class PerspectiveCamera:
             [0, 0, -1, 0]
         ], dtype="float32")
 
-    def moveRelative(self, d):
-        d = np.array([d[0], d[1], d[2], 0])
+    def updateViewMatrix(self):
         self.viewMatrix = (
-            np.linalg.inv(self.rotMatrix) *
-            np.linalg.inv(translationMatrix(d)) *
-            self.viewMatrix
+            self.quat.inverse.transformation_matrix *
+            inv(translationMatrix(self.pos))
         )
 
+    def move(self, d):
+        self.pos += self.quat.rotate(d)
+        self.updateViewMatrix()
+
+    def rotate(self, deg, axis):
+        r = np.deg2rad(deg)
+        axis = self.quat.rotate(axis)
+        self.quat = Quaternion(axis=axis, angle=r) * self.quat
+        self.updateViewMatrix()
+
     def setPosition(self, p):
-        p = -np.array(p)
-        self.viewMatrix = np.matrix([
-            [1, 0, 0, p[0]],
-            [0, 1, 0, p[1]],
-            [0, 0, 1, p[2]],
-            [0, 0, 0, 1]
-        ], dtype="float32")
+        self.pos = p
+        self.updateViewMatrix()

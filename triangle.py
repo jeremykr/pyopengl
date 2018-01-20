@@ -2,6 +2,7 @@ from OpenGL.GL import *
 import numpy as np
 from shader_utils import *
 from matrix_utils import *
+from ctypes import *
 
 class Triangle:
     def __init__(self):
@@ -33,6 +34,9 @@ class Triangle:
         glUniformMatrix4fv(mid, 1, GL_TRUE, mvp)
 
         glEnableVertexAttribArray(0)
+
         glBindBuffer(GL_ARRAY_BUFFER, self.vbuf)
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, None)
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, c_void_p(0))
         glDrawArrays(GL_TRIANGLES, 0, 3)
+        
+        glDisableVertexAttribArray(0)

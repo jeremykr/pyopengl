@@ -25,6 +25,10 @@ class Game:
 
         self.camera.setPosition([0, 0, 2])
 
+        pg.mouse.set_visible(False)
+        # Lock input to the application
+        pg.event.set_grab(True)
+
     def draw(self):
         # Clear
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -35,13 +39,13 @@ class Game:
 
     def update(self, dt):
         keys = pg.key.get_pressed()
+        mouseX, mouseY = pg.mouse.get_rel()
 
         # Rotate camera
         camRotSpeed = 50*dt
-        if keys[pg.K_LEFT]: self.camera.rotate(camRotSpeed, [0,1,0])
-        if keys[pg.K_RIGHT]: self.camera.rotate(-camRotSpeed, [0,1,0])
-        if keys[pg.K_UP]: self.camera.rotate(-camRotSpeed, [1,0,0])
-        if keys[pg.K_DOWN]: self.camera.rotate(camRotSpeed, [1,0,0])
+        mouseSens = 0.1
+        self.camera.rotate(-mouseX * mouseSens, [0,1,0])
+        self.camera.rotate(-mouseY * mouseSens, [1,0,0])
         if keys[pg.K_q]: self.camera.rotate(camRotSpeed, [0,0,1])
         if keys[pg.K_e]: self.camera.rotate(-camRotSpeed, [0,0,1])
 
@@ -63,6 +67,8 @@ class Game:
             # Handle events
             for event in pg.event.get():
                     if event.type == pg.QUIT:
+                        return
+                    if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                         return
             self.draw()
             dt = self.clock.tick(self.fps) / 1000.0

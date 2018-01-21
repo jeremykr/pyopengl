@@ -3,6 +3,7 @@ from OpenGL.GL import *
 import numpy as np
 from triangle import *
 from camera import *
+from model import *
 
 class Game:
     def __init__(self):
@@ -28,6 +29,11 @@ class Game:
         pg.mouse.set_visible(False)
         # Lock input to the application
         pg.event.set_grab(True)
+
+        m = Model.fromObj("models/cube/cube.obj").setShaders("triangle.vs", "triangle.fs")
+
+        self.objs[m.name] = m
+        self.objs[m.name].pos[2] = -10
 
     def draw(self):
         # Clear

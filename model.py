@@ -4,6 +4,7 @@ from shader_utils import *
 from matrix_utils import *
 from ctypes import *
 from material import *
+from pyquaternion import *
 
 # This class represents a generic 3D model defined by a vertex buffer
 # which contains vertex, texture, and normal data.
@@ -15,8 +16,11 @@ class Model:
 
         self.material = Material()
         
-        self.pos = np.array([0, 0, 0], dtype="float32")
-        self.scale = np.array([1, 1, 1], dtype="float32")
+        self.__pos = np.array([0, 0, 0], dtype="float32")
+        self.__scale = np.array([1, 1, 1], dtype="float32")
+        self.quat = Quaternion()
+
+        self.modelMatrix = np.identity(4, dtype="float32")
 
         vaid = glGenVertexArrays(1)
         glBindVertexArray(vaid)
@@ -25,6 +29,36 @@ class Model:
         glBufferData(GL_ARRAY_BUFFER, vertexData, GL_STATIC_DRAW)
         # needs to be initialized manually after creation
         self.pid = None
+
+    # Move model in the direction and magnitude of vector `d`.
+    def move(self, d):
+        self.__pos += self.quat.rotate(d)
+        self.__updateModelMatrix()
+
+    # Rotate model by `deg` degrees around local axis `axis`.
+    def rotate(self, deg, axis):
+        r = np.deg2rad(deg)
+        axis = self.quat.rotate(axis)
+        self.quat = Quaternion(axis=axis, angle=r) * self.quat
+        self.__updateModelMatrix()
+
+    # Scale model using vector `s`, containing x, y, and z scale factors.
+    def scale(self, s):
+        self.__scale *= s
+        self.__updateModelMatrix()
+
+    # Set the absolute position `p` of the model in world coordinates.
+    def setPosition(self, p):
+        self.__pos = p
+        self.__updateModelMatrix()
+
+    # Update the model matrix after the model has been affected.
+    def __updateModelMatrix(self):
+        self.modelMatrix = (
+            translationMatrix(self.__pos) * 
+            self.quat.transformation_matrix * 
+            scaleMatrix(self.__scale)
+        )
 
     # Load and link the shaders for the model.
     # If a shader program already exists, make sure to
@@ -42,9 +76,8 @@ class Model:
         glUseProgram(self.pid)
 
         # Send model, view, and projection matrices to pipeline
-        modelMatrix = translationMatrix(self.pos) * scaleMatrix(self.scale)
         uid = glGetUniformLocation(self.pid, "M")
-        glUniformMatrix4fv(uid, 1, GL_TRUE, modelMatrix)
+        glUniformMatrix4fv(uid, 1, GL_TRUE, self.modelMatrix)
         uid = glGetUniformLocation(self.pid, "V")
         glUniformMatrix4fv(uid, 1, GL_TRUE, viewMatrix)
         uid = glGetUniformLocation(self.pid, "P")

@@ -23,9 +23,6 @@ class Game:
         pg.display.set_caption("Vegetables")
         glClearColor(0,0,0,0)
 
-        self.objs["triangle"] = Triangle()
-        self.objs["triangle"].pos[2] = -3
-
         self.camera.setPosition([0, 0, 2])
 
         self.light = Light(
@@ -37,12 +34,21 @@ class Game:
         # Lock input to the application
         pg.event.set_grab(True)
 
-        m = Model \
+        # Create scene objects
+        self.objs["triangle"] = Triangle()
+        self.objs["triangle"].pos[2] = -3
+
+        cube = Model \
             .fromObj("models/cube/cube.obj") \
             .setShaders("models/cube/cube.vs", "models/cube/cube.fs")
+        self.objs["cube"] = cube
+        self.objs["cube"].setPosition([0, 0, -10])
 
-        self.objs[m.name] = m
-        self.objs[m.name].pos[2] = -10
+        teacup = Model \
+            .fromObj("models/teacup/Teacup.obj") \
+            .setShaders("models/teacup/teacup.vs", "models/teacup/teacup.fs")
+        self.objs["teacup"] = teacup
+        self.objs["teacup"].setPosition([2,-2,0])
 
     def draw(self):
         # Clear
@@ -80,6 +86,8 @@ class Game:
         if keys[pg.K_r]: moveDirection[1] += 1
         moveDirection = normalize(moveDirection)
         self.camera.move(moveDirection * camMoveSpeed)
+
+        self.objs["cube"].rotate(40 * dt, [0,1,0])
 
     def loop(self):
         # Game loop

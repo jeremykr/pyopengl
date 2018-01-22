@@ -3,6 +3,7 @@ import numpy as np
 from shader_utils import *
 from matrix_utils import *
 from ctypes import *
+from material import *
 
 # This class represents a generic 3D model defined by a vertex buffer
 # which contains vertex, texture, and normal data.
@@ -11,6 +12,8 @@ class Model:
         self.name = name
         self.numVertices = int(vertexData.size / 8)
         self.bufferStride = sizeof(c_float) * 8
+
+        self.material = Material()
         
         self.pos = np.array([0, 0, 0], dtype="float32")
         self.scale = np.array([1, 1, 1], dtype="float32")
@@ -35,13 +38,41 @@ class Model:
         })
         return self
 
-    def draw(self, viewMatrix, projMatrix):
+    def draw(self, viewMatrix, projMatrix, light):
         glUseProgram(self.pid)
-        # Send model-view-projection (MVP) matrix to GPU
+
+        # Send model, view, and projection matrices to pipeline
         modelMatrix = translationMatrix(self.pos) * scaleMatrix(self.scale)
-        mvp = projMatrix * viewMatrix * modelMatrix
-        mid = glGetUniformLocation(self.pid, "MVP")
-        glUniformMatrix4fv(mid, 1, GL_TRUE, mvp)
+        uid = glGetUniformLocation(self.pid, "M")
+        glUniformMatrix4fv(uid, 1, GL_TRUE, modelMatrix)
+        uid = glGetUniformLocation(self.pid, "V")
+        glUniformMatrix4fv(uid, 1, GL_TRUE, viewMatrix)
+        uid = glGetUniformLocation(self.pid, "P")
+        glUniformMatrix4fv(uid, 1, GL_TRUE, projMatrix)
+
+        # Pass light direction vector to pipeline
+        uid = glGetUniformLocation(self.pid, "LightDirection")
+        glUniform3fv(uid, 1, light.direction)
+
+        # Pass light colour vector to pipeline
+        uid = glGetUniformLocation(self.pid, "LightColour")
+        glUniform3fv(uid, 1, light.colour)
+
+        # Pass material information to pipeline
+        uid = glGetUniformLocation(self.pid, "Ns")
+        glUniform1f(uid, self.material.Ns)
+        uid = glGetUniformLocation(self.pid, "Ni")
+        glUniform1f(uid, self.material.Ni)
+        uid = glGetUniformLocation(self.pid, "Ka")
+        glUniform3fv(uid, 1, self.material.Ka)
+        uid = glGetUniformLocation(self.pid, "Kd")
+        glUniform3fv(uid, 1, self.material.Kd)
+        uid = glGetUniformLocation(self.pid, "Ks")
+        glUniform3fv(uid, 1, self.material.Ks)
+        uid = glGetUniformLocation(self.pid, "Ke")
+        glUniform3fv(uid, 1, self.material.Ke)
+        uid = glGetUniformLocation(self.pid, "illum")
+        glUniform1i(uid, self.material.illum)
 
         glEnableVertexAttribArray(0)
         glEnableVertexAttribArray(1)

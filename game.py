@@ -4,6 +4,7 @@ import numpy as np
 from triangle import *
 from camera import *
 from model import *
+from light import *
 
 class Game:
     def __init__(self):
@@ -11,6 +12,7 @@ class Game:
         self.camera = PerspectiveCamera()
         self.clock = pg.time.Clock()
         self.fps = 60
+        self.light = None
 
     def startup(self):
         pg.init()
@@ -26,11 +28,18 @@ class Game:
 
         self.camera.setPosition([0, 0, 2])
 
+        self.light = Light(
+            direction=[1, -0.8, -0.3],
+            colour=[1, 1, 1]
+        )
+
         pg.mouse.set_visible(False)
         # Lock input to the application
         pg.event.set_grab(True)
 
-        m = Model.fromObj("models/cube/cube.obj").setShaders("triangle.vs", "triangle.fs")
+        m = Model \
+            .fromObj("models/cube/cube.obj") \
+            .setShaders("models/cube/cube.vs", "models/cube/cube.fs")
 
         self.objs[m.name] = m
         self.objs[m.name].pos[2] = -10
@@ -39,7 +48,12 @@ class Game:
         # Clear
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         # Draw objects
-        for o in self.objs.values(): o.draw(self.camera.viewMatrix, self.camera.projMatrix)
+        for o in self.objs.values(): 
+            o.draw(
+                self.camera.viewMatrix, 
+                self.camera.projMatrix, 
+                self.light
+            )
         # Swap Pygame display
         pg.display.flip()
 

@@ -27,7 +27,7 @@ class Triangle:
 
         del vbuf_data, vaid
 
-    def draw(self, viewMatrix, projMatrix):
+    def draw(self, viewMatrix, projMatrix, light):
         glUseProgram(self.pid)
         
         modelMatrix = translationMatrix(self.pos) * scaleMatrix(self.scale)
@@ -36,9 +36,9 @@ class Triangle:
         glUniformMatrix4fv(mid, 1, GL_TRUE, mvp)
 
         glEnableVertexAttribArray(0)
-
+        glEnable(GL_DEPTH_TEST)
         glBindBuffer(GL_ARRAY_BUFFER, self.vbuf)
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, c_void_p(0))
         glDrawArrays(GL_TRIANGLES, 0, 3)
-
+        glDisable(GL_DEPTH_TEST)
         glDisableVertexAttribArray(0)

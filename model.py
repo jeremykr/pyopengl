@@ -112,12 +112,14 @@ class Model:
         glEnableVertexAttribArray(2)
 
         glEnable(GL_DEPTH_TEST)
+        glEnable(GL_CULL_FACE)
         glBindBuffer(GL_ARRAY_BUFFER, self.vbuf)
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, self.bufferStride, c_void_p(sizeof(c_float)*0))
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, self.bufferStride, c_void_p(sizeof(c_float)*3))
         glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, self.bufferStride, c_void_p(sizeof(c_float)*5))
         glDrawArrays(GL_TRIANGLES, 0, self.numVertices)
         glDisable(GL_DEPTH_TEST)
+        glDisable(GL_CULL_FACE)
 
         glDisableVertexAttribArray(0)
         glDisableVertexAttribArray(1)

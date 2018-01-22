@@ -8,7 +8,7 @@ class PerspectiveCamera:
         self.view_width = 800
         self.view_height = 600
         self.far_plane = 1000.0
-        self.near_plane = 0.01
+        self.near_plane = 0.05
         self.fov = 60
         self.aspect_ratio = self.view_width / self.view_height
 

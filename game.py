@@ -49,6 +49,7 @@ class Game:
             .setShaders("models/teacup/teacup.vs", "models/teacup/teacup.fs")
         self.objs["teacup"] = teacup
         self.objs["teacup"].setPosition([2,-2,0])
+        self.objs["teacup"].material = Material.fromMtl("models/teacup/Teacup.mtl")
 
     def draw(self):
         # Clear

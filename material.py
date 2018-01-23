@@ -37,4 +37,26 @@ class Material:
     # Loads information from a .mtl file into a Material object.
     @staticmethod
     def fromMtl(filename):
-        pass
+        data = []
+        with open(filename) as f:
+            data = [line.strip() for line in f.readlines()]
+
+        m = Material()
+
+        for line in data:
+            if line.startswith("newmtl "):
+                m.name = line[7:]
+            elif line.startswith("K"):
+                vec = np.array([float(x) for x in line[3:].split()])
+                if line.startswith("Ka "): m.Ka = vec
+                elif line.startswith("Kd "): m.Kd = vec
+                elif line.startswith("Ks "): m.Ks = vec
+                elif line.startswith("Ke "): m.Ke = vec
+            elif line.startswith("Ni "):
+                m.Ni = float(line[3:])
+            elif line.startswith("d "):
+                m.d = float(line[2:])
+            elif line.startswith("illum "):
+                m.illum = int(line[6:])
+
+        return m

@@ -27,11 +27,11 @@ class Triangle:
 
         del vbuf_data, vaid
 
-    def draw(self, viewMatrix, projMatrix, light):
+    def draw(self, camera, light):
         glUseProgram(self.pid)
         
         modelMatrix = translationMatrix(self.pos) * scaleMatrix(self.scale)
-        mvp = projMatrix * viewMatrix * modelMatrix
+        mvp = camera.projMatrix * camera.viewMatrix * modelMatrix
         mid = glGetUniformLocation(self.pid, "MVP")
         glUniformMatrix4fv(mid, 1, GL_TRUE, mvp)
 

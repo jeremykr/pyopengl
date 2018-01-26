@@ -57,8 +57,7 @@ class Game:
         # Draw objects
         for o in self.objs.values(): 
             o.draw(
-                self.camera.viewMatrix, 
-                self.camera.projMatrix, 
+                self.camera,
                 self.light
             )
         # Swap Pygame display
@@ -89,6 +88,7 @@ class Game:
         self.camera.move(moveDirection * camMoveSpeed)
 
         self.objs["cube"].rotate(40 * dt, [0,1,0])
+        self.objs["teacup"].rotate(40 * dt, [1,1,1])
 
     def loop(self):
         # Game loop

@@ -5,6 +5,7 @@ layout(location = 1) in vec2 uv;
 layout(location = 2) in vec3 normal;
 
 out VertexData {
+    vec3 pos;
     vec2 uv;
     vec4 normal;
 } v;
@@ -14,6 +15,7 @@ uniform mat4 M, V, P;
 void main() {
     gl_Position = P * V * M * vec4(pos, 1.0);
     
+    v.pos = pos;
     v.uv = uv;
     v.normal = normalize(vec4(normal, 0));
 }

@@ -72,16 +72,16 @@ class Model:
         })
         return self
 
-    def draw(self, viewMatrix, projMatrix, light):
+    def draw(self, camera, light):
         glUseProgram(self.pid)
 
         # Send model, view, and projection matrices to pipeline
         uid = glGetUniformLocation(self.pid, "M")
         glUniformMatrix4fv(uid, 1, GL_TRUE, self.modelMatrix)
         uid = glGetUniformLocation(self.pid, "V")
-        glUniformMatrix4fv(uid, 1, GL_TRUE, viewMatrix)
+        glUniformMatrix4fv(uid, 1, GL_TRUE, camera.viewMatrix)
         uid = glGetUniformLocation(self.pid, "P")
-        glUniformMatrix4fv(uid, 1, GL_TRUE, projMatrix)
+        glUniformMatrix4fv(uid, 1, GL_TRUE, camera.projMatrix)
 
         # Pass light direction vector to pipeline
         uid = glGetUniformLocation(self.pid, "LightDirection")
@@ -90,6 +90,10 @@ class Model:
         # Pass light colour vector to pipeline
         uid = glGetUniformLocation(self.pid, "LightColour")
         glUniform3fv(uid, 1, light.colour)
+
+        # Pass eye/camera position to pipeline
+        uid = glGetUniformLocation(self.pid, "ViewPosition")
+        glUniform3fv(uid, 1, camera.pos)
 
         # Pass material information to pipeline
         uid = glGetUniformLocation(self.pid, "Ns")

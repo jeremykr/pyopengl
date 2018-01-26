@@ -37,5 +37,5 @@ void main() {
             Is = pow(max(dot(H, N), 0), Ns);
         }
     }
-    color = Kd * (Ka*Ia + Kd*Id*LightColour + Ks*Is*LightColour);
+    color = Ka*Ia + (Kd*Id + Ks*Is) * LightColour;
 }

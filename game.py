@@ -7,11 +7,12 @@ from model import *
 from light import *
 
 from scenes.scene1 import *
+from scenes.scene2 import *
 
 class Game:
     def __init__(self):
         self.scenes = []
-        self.currentScene = None
+        self.activeSceneId = 1
         self.clock = pg.time.Clock()
         self.fps = 60
         self.screenWidth = 0
@@ -31,17 +32,19 @@ class Game:
         ### Setup Scene 1 ###
         s1 = Scene1()
         self.scenes.append(s1)
-        self.currentScene = s1
+
+        s2 = Scene2()
+        self.scenes.append(s2)
 
     def draw(self):
         # Clear
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        self.currentScene.draw()
+        self.scenes[self.activeSceneId].draw()
         # Swap Pygame display
         pg.display.flip()
 
     def update(self, dt):
-        self.currentScene.update(dt)
+        self.scenes[self.activeSceneId].update(dt)
 
     def loop(self):
         # Game loop

@@ -1,0 +1,8 @@
+#version 330 core
+
+uniform mat4 M;
+out vec3 color;
+
+void main() {
+    color = vec3(1,1,1);
+}

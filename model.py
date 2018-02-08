@@ -9,10 +9,12 @@ from pyquaternion import *
 # This class represents a generic 3D model defined by a vertex buffer
 # which contains vertex, texture, and normal data.
 class Model:
-    def __init__(self, name, vertexData):
+    def __init__(self, vertexData, vertexFormat, name=None):
         self.name = name
-        self.numVertices = int(vertexData.size / 8)
-        self.bufferStride = sizeof(c_float) * 8
+        self.vertexFormat = vertexFormat
+        self.numVertices = int(vertexData.size / sum(vertexFormat))
+        self.bufferStride = sizeof(c_float) * sum(vertexFormat)
+        self.drawMode = GL_TRIANGLES
 
         self.material = Material()
         
@@ -111,23 +113,31 @@ class Model:
         uid = glGetUniformLocation(self.pid, "illum")
         glUniform1i(uid, self.material.illum)
 
-        glEnableVertexAttribArray(0)
-        glEnableVertexAttribArray(1)
-        glEnableVertexAttribArray(2)
+        for i in range(len(self.vertexFormat)):
+            glEnableVertexAttribArray(i)
 
         glEnable(GL_DEPTH_TEST)
         glEnable(GL_CULL_FACE)
         glBindBuffer(GL_ARRAY_BUFFER, self.vbuf)
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, self.bufferStride, c_void_p(sizeof(c_float)*0))
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, self.bufferStride, c_void_p(sizeof(c_float)*3))
-        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, self.bufferStride, c_void_p(sizeof(c_float)*5))
-        glDrawArrays(GL_TRIANGLES, 0, self.numVertices)
+
+        offset = 0
+        for i, size in enumerate(self.vertexFormat):
+            glVertexAttribPointer(
+                i, 
+                size, 
+                GL_FLOAT, 
+                GL_FALSE, 
+                self.bufferStride, 
+                c_void_p(sizeof(c_float)*offset)
+            )
+            offset += size
+
+        glDrawArrays(self.drawMode, 0, self.numVertices)
         glDisable(GL_DEPTH_TEST)
         glDisable(GL_CULL_FACE)
 
-        glDisableVertexAttribArray(0)
-        glDisableVertexAttribArray(1)
-        glDisableVertexAttribArray(2)
+        for i in range(len(self.vertexFormat)):
+            glDisableVertexAttribArray(i)
 
     # Reads data from a Wavefront .obj file specified by `filename`
     # into a Model object.
@@ -168,4 +178,4 @@ class Model:
                     point = [int(x)-1 for x in point.split("/")]
                     vdata += v[point[0]] + vt[point[1]] + vn[point[2]]
 
-        return Model(name, np.array(vdata, dtype="float32"))
+        return Model(np.array(vdata, dtype="float32"), [3,2,3], name)

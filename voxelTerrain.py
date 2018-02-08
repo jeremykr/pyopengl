@@ -8,8 +8,8 @@ class VoxelTerrain(Model):
         height = surface.get_height()
         texData = pg.image.tostring(surface, "RGBA", True)
 
-        # move pixel values from 0-255 to -128-127
-        texData = np.array([i for i in texData]) - 128
+        texData = np.array([i for i in texData]) / 255
+
         tex = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, tex)
         glTexImage2D(
@@ -24,15 +24,35 @@ class VoxelTerrain(Model):
             texData         # texture data
         )
 
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+
+        terrainScale = 1 / 15
         # define the space between points
         offset = 1/(width-1)
-        vertexData = np.empty(width * height * 2, dtype="float32")
+        vertexData = np.empty(width * height * 3, dtype="float32")
         for y in range(height):
             for x in range(width):
-                vertexData[y * width * 2 + x * 2] = x * offset - 0.5
-                vertexData[y * width * 2 + x * 2 + 1] = y * offset - 0.5
+                i = y * width * 3 + x * 3
+                vertexData[i] = x * offset
+                vertexData[i+1] = texData[y * width * 4 + x * 4] * terrainScale
+                vertexData[i+2] = y * offset
 
-        super().__init__(vertexData, [2])
+        super().__init__(vertexData, [3])
 
         self.drawMode = GL_POINTS
+
+    def draw(self, camera, light):
+        glActiveTexture(GL_TEXTURE0)
+        super().draw(camera, light)
+
+    def setShaders(self, vshader, gshader, fshader):
+        self.pid = makeProgram({
+            GL_VERTEX_SHADER : vshader,
+            GL_GEOMETRY_SHADER : gshader,
+            GL_FRAGMENT_SHADER : fshader
+        })
+        return self
         

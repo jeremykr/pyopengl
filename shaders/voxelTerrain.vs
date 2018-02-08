@@ -1,9 +1,12 @@
 #version 330 core
 
-layout(location = 0) in vec2 pos;
+layout(location = 0) in vec3 pos;
 
 uniform mat4 M, V, P;
 
+out vec3 vert;
+
 void main() {
-    gl_Position = P * V * M * vec4(pos.x, 0.0, pos.y, 1.0);
+    vert = pos;
+    gl_Position = P * V * M * vec4(pos, 1.0);
 }

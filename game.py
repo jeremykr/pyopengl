@@ -5,6 +5,7 @@ from triangle import *
 from camera import *
 from model import *
 from light import *
+import os
 
 from scenes.scene1 import *
 from scenes.scene2 import *
@@ -12,13 +13,14 @@ from scenes.scene2 import *
 class Game:
     def __init__(self):
         self.scenes = []
-        self.activeSceneId = 1
+        self.activeSceneId = 0
         self.clock = pg.time.Clock()
         self.fps = 60
         self.screenWidth = 0
         self.screenHeight = 0
 
     def startup(self):
+        os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (100, 100)
         pg.init()
         self.screenWidth = 800
         self.screenHeight = 600
@@ -30,8 +32,8 @@ class Game:
         glClearColor(0,0,0,0)
 
         ### Setup Scene 1 ###
-        s1 = Scene1()
-        self.scenes.append(s1)
+        #s1 = Scene1()
+        #self.scenes.append(s1)
 
         s2 = Scene2()
         self.scenes.append(s2)

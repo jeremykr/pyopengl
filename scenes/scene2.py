@@ -17,8 +17,12 @@ class Scene2(Scene):
         # Lock input to the application
         pg.event.set_grab(True)
 
-        terrain = VoxelTerrain("images/BergenHeightMap.png")
-        terrain.setShaders("shaders/voxelTerrain.vs", "shaders/voxelTerrain.fs")
+        terrain = VoxelTerrain("images/Bergen128.png")
+        terrain.setShaders(
+            "shaders/voxelTerrain.vs", 
+            "shaders/voxelTerrain.gs",
+            "shaders/voxelTerrain.fs"
+        )
         terrain.scale(5)
         self.objs["terrain"] = terrain
 

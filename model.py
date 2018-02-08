@@ -66,8 +66,6 @@ class Model:
     # If a shader program already exists, make sure to
     # delete it before linking another one.
     def setShaders(self, vshader, fshader):
-        if self.pid:
-            glDeleteProgram(self.pid)
         self.pid = makeProgram({
             GL_VERTEX_SHADER : vshader,
             GL_FRAGMENT_SHADER : fshader

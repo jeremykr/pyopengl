@@ -1,8 +1,11 @@
 #version 330 core
 
+in vec3 fvert;
+
+uniform sampler2D tex;
 uniform mat4 M;
-out vec3 color;
+out vec4 color;
 
 void main() {
-    color = vec3(1,1,1);
+    color = texture2D(tex, vec2(fvert.x, fvert.z));
 }

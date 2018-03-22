@@ -31,7 +31,7 @@ class Triangle:
         glUseProgram(self.pid)
         
         modelMatrix = translationMatrix(self.pos) * scaleMatrix(self.scale)
-        mvp = camera.projMatrix * camera.viewMatrix * modelMatrix
+        mvp = camera.projMatrix * camera.getViewMatrix() * modelMatrix
         mid = glGetUniformLocation(self.pid, "MVP")
         glUniformMatrix4fv(mid, 1, GL_TRUE, mvp)
 

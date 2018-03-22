@@ -14,7 +14,6 @@ class PerspectiveCamera:
 
         self.pos = np.zeros(3, dtype="float32")
         self.quat = Quaternion()
-        self.viewMatrix = np.identity(4, dtype="float32")
 
         n = self.near_plane
         f = self.far_plane
@@ -28,22 +27,19 @@ class PerspectiveCamera:
             [0, 0, -1, 0]
         ], dtype="float32")
 
-    def updateViewMatrix(self):
-        self.viewMatrix = (
+    def getViewMatrix(self):
+        return (
             self.quat.inverse.transformation_matrix *
             inv(translationMatrix(self.pos))
         )
 
     def move(self, d):
         self.pos += self.quat.rotate(d)
-        self.updateViewMatrix()
 
     def rotate(self, deg, axis):
         r = np.deg2rad(deg)
         axis = self.quat.rotate(axis)
         self.quat = Quaternion(axis=axis, angle=r) * self.quat
-        self.updateViewMatrix()
 
     def setPosition(self, p):
         self.pos = p
-        self.updateViewMatrix()

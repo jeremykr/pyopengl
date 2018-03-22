@@ -22,8 +22,6 @@ class Model:
         self.__scale = np.array([1, 1, 1], dtype="float32")
         self.quat = Quaternion()
 
-        self.modelMatrix = np.identity(4, dtype="float32")
-
         self.vao = glGenVertexArrays(1)
         glBindVertexArray(self.vao)
         self.vbo = glGenBuffers(1)
@@ -51,28 +49,23 @@ class Model:
     # Move model in the direction and magnitude of vector `d`.
     def move(self, d):
         self.__pos += self.quat.rotate(d)
-        self.__updateModelMatrix()
 
     # Rotate model by `deg` degrees around local axis `axis`.
     def rotate(self, deg, axis):
         r = np.deg2rad(deg)
         axis = self.quat.rotate(axis)
         self.quat = Quaternion(axis=axis, angle=r) * self.quat
-        self.__updateModelMatrix()
 
     # Scale model using vector `s`, containing x, y, and z scale factors.
     def scale(self, s):
         self.__scale *= s
-        self.__updateModelMatrix()
 
     # Set the absolute position `p` of the model in world coordinates.
     def setPosition(self, p):
         self.__pos = p
-        self.__updateModelMatrix()
 
-    # Update the model matrix after the model has been affected.
-    def __updateModelMatrix(self):
-        self.modelMatrix = (
+    def getModelMatrix(self):
+        return (
             translationMatrix(self.__pos) * 
             self.quat.transformation_matrix * 
             scaleMatrix(self.__scale)
@@ -93,9 +86,9 @@ class Model:
 
         # Send model, view, and projection matrices to pipeline
         uid = glGetUniformLocation(self.pid, "M")
-        glUniformMatrix4fv(uid, 1, GL_TRUE, self.modelMatrix)
+        glUniformMatrix4fv(uid, 1, GL_TRUE, self.getModelMatrix())
         uid = glGetUniformLocation(self.pid, "V")
-        glUniformMatrix4fv(uid, 1, GL_TRUE, camera.viewMatrix)
+        glUniformMatrix4fv(uid, 1, GL_TRUE, camera.getViewMatrix())
         uid = glGetUniformLocation(self.pid, "P")
         glUniformMatrix4fv(uid, 1, GL_TRUE, camera.projMatrix)
 

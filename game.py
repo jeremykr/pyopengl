@@ -32,11 +32,12 @@ class Game:
         glClearColor(0,0,0,0)
 
         ### Setup Scene 1 ###
-        #s1 = Scene1()
-        #self.scenes.append(s1)
+        s1 = Scene1()
+        self.scenes.append(s1)
 
-        s2 = Scene2()
-        self.scenes.append(s2)
+        ### Setup Scene 2 ###
+        #s2 = Scene2()
+        #self.scenes.append(s2)
 
     def draw(self):
         # Clear

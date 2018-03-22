@@ -16,7 +16,7 @@ class Scene:
 
     def draw(self):
         # Draw objects
-        for o in self.objs.values(): 
+        for o in self.objs.values():
             o.draw(
                 self.camera,
                 self.light

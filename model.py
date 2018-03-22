@@ -24,11 +24,27 @@ class Model:
 
         self.modelMatrix = np.identity(4, dtype="float32")
 
-        vaid = glGenVertexArrays(1)
-        glBindVertexArray(vaid)
-        self.vbuf = glGenBuffers(1)
-        glBindBuffer(GL_ARRAY_BUFFER, self.vbuf)
+        self.vao = glGenVertexArrays(1)
+        glBindVertexArray(self.vao)
+        self.vbo = glGenBuffers(1)
+        glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
+
         glBufferData(GL_ARRAY_BUFFER, vertexData, GL_STATIC_DRAW)
+
+        offset = 0
+        for i, size in enumerate(self.vertexFormat):
+            glEnableVertexAttribArray(i)
+            glVertexAttribPointer(
+                i, 
+                size, 
+                GL_FLOAT, 
+                GL_FALSE, 
+                self.bufferStride, 
+                c_void_p(sizeof(c_float)*offset)
+            )
+            offset += size
+
+        glBindVertexArray(0)
         # needs to be initialized manually after creation
         self.pid = None
 
@@ -110,32 +126,17 @@ class Model:
         glUniform3fv(uid, 1, self.material.Ke)
         uid = glGetUniformLocation(self.pid, "illum")
         glUniform1i(uid, self.material.illum)
-
-        for i in range(len(self.vertexFormat)):
-            glEnableVertexAttribArray(i)
-
+    
         glEnable(GL_DEPTH_TEST)
         glEnable(GL_CULL_FACE)
-        glBindBuffer(GL_ARRAY_BUFFER, self.vbuf)
 
-        offset = 0
-        for i, size in enumerate(self.vertexFormat):
-            glVertexAttribPointer(
-                i, 
-                size, 
-                GL_FLOAT, 
-                GL_FALSE, 
-                self.bufferStride, 
-                c_void_p(sizeof(c_float)*offset)
-            )
-            offset += size
-
+        glBindVertexArray(self.vao)
         glDrawArrays(self.drawMode, 0, self.numVertices)
+        glBindVertexArray(0)
+
         glDisable(GL_DEPTH_TEST)
         glDisable(GL_CULL_FACE)
-
-        for i in range(len(self.vertexFormat)):
-            glDisableVertexAttribArray(i)
+        glUseProgram(0)
 
     # Reads data from a Wavefront .obj file specified by `filename`
     # into a Model object.
